@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SM Attendance</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+    h1 { text-align: center; color: #333; }
+    input { width: 70%; padding: 10px; font-size: 16px; }
+    button { padding: 10px; font-size: 16px; background: #007bff; color: white; border: none; }
+    .student { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; }
+    .present { background: #28a745; color: white; padding: 5px 10px; border: none; border-radius: 5px; }
+    .absent { background: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>SM Duty Attendance 🚂</h1>
+  <input id="nameInput" placeholder="Naam daal lala">
+  <button onclick="addStudent()">Add</button>
+  <div id="list"></div>
+  <h3 id="count">Total: 0 | Present: 0</h3>
+
+  <script>
+    let students = JSON.parse(localStorage.getItem('students')) || [];
+    
+    function render() {
+      document.getElementById('list').innerHTML = students.map((s, i) => `
+        <div class="student">
+          <span>${s.name}</span>
+          <button class="${s.status}" onclick="toggle(${i})">${s.status}</button>
+          <button onclick="remove(${i})">❌</button>
+        </div>
+      `).join('');
+      updateCount();
+    }
+    
+    function addStudent() {
+      let name = document.getElementById('nameInput').value;
+      if(name) {
+        students.push({name: name, status: 'Absent'});
+        document.getElementById('nameInput').value = '';
+        save();
+      }
+    }
+    
+    function toggle(i) {
+      students[i].status = students[i].status === 'Present' ? 'Absent' : 'Present';
+      save();
+    }
+    
+    function remove(i) {
+      students.splice(i, 1);
+      save();
+    }
+    
+    function save() {
+      localStorage.setItem('students', JSON.stringify(students));
+      render();
+    }
+    
+    function updateCount() {
+      let present = students.filter(s => s.status === 'Present').length;
+      document.getElementById('count').innerText = `Total: ${students.length} | Present: ${present}`;
+    }
+    
+    render();
+  </script>
+</body>
+</html>
